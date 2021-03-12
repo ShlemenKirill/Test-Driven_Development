@@ -12,6 +12,7 @@ namespace LandonHotel.Tests
         public BookingServiceTests()
         {
             _roomRepo = new Mock<IRoomsRepository>();
+            _roomRepo.Setup(r => r.GetRoom(1)).Returns(new Room());
         }
 
         private BookingService Subject()
@@ -50,6 +51,28 @@ namespace LandonHotel.Tests
             var isValid = service.IsBookingValid(1, new Booking { HasPets = hasPets });
 
             Assert.Equal(isValid, result);
+        }
+
+        [Fact]
+        public void IsBookingValid_GuestLessThanCapacity_Valid()
+        {
+            var service = Subject();
+            _roomRepo.Setup(r => r.GetRoom(1)).Returns(new Room { Capacity = 4 });
+
+            var isValid = service.IsBookingValid(1, new Booking { NumberOfGuests = 1 });
+
+            Assert.True(isValid);
+        }
+
+        [Fact]
+        public void IsBookingValid_GuestGreaterThanCapacity_Invalid()
+        {
+            var service = Subject();
+            _roomRepo.Setup(r => r.GetRoom(1)).Returns(new Room { Capacity = 2 });
+
+            var isValid = service.IsBookingValid(1, new Booking { NumberOfGuests = 10 });
+
+            Assert.False(isValid);
         }
     }
 }

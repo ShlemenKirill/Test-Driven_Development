@@ -22,11 +22,19 @@ namespace LandonHotel.Services
             {
                 return false;
             }
+
             var room = _roomsRepo.GetRoom(roomId);
+
             if (guestIsBringingPets && !room.ArePetsAllowed)
             {
                 return false;
             }
+
+            if (numberOfGuests > room.Capacity)
+            {
+                return false;
+            }
+
             return true;
         }
     }
