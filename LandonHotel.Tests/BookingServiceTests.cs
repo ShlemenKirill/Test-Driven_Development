@@ -35,49 +35,21 @@ namespace LandonHotel.Tests
             var isValid = service.IsBookingValid(1, new Booking { IsSmoking = true });
 
             Assert.False(isValid);
-        }
+        }       
 
-        [Fact]
-        public void IsBookingValid_PetsNotAllowed_Invalid()
+        [Theory]
+        [InlineData(false, true, false)]
+        [InlineData(false, false, true)]
+        [InlineData(true, true, true)]
+        [InlineData(true, false, true)]
+        public void IsBookingValid_Pets(bool areAllowed, bool hasPets, bool result)
         {
             var service = Subject();
-            _roomRepo.Setup(r => r.GetRoom(1)).Returns(new Room() { ArePetsAllowed = false });
-            var isValid = service.IsBookingValid(1, new Booking { HasPets = true });
+            _roomRepo.Setup(r => r.GetRoom(1)).Returns(new Room { ArePetsAllowed = areAllowed });
 
-            Assert.False(isValid);
-        }
+            var isValid = service.IsBookingValid(1, new Booking { HasPets = hasPets });
 
-        [Fact]
-        public void IsBookingValid_PetsAllowed_IsValid()
-        {
-            var service = Subject();
-            _roomRepo.Setup(r => r.GetRoom(1)).Returns(new Room { ArePetsAllowed = true });
-
-            var isValid = service.IsBookingValid(1, new Booking { HasPets = true });
-
-            Assert.True(isValid);
-        }
-
-        [Fact]
-        public void IsBookingValid_NoPetsAllowed_IsValid()
-        {
-            var service = Subject();
-            _roomRepo.Setup(r => r.GetRoom(1)).Returns(new Room { ArePetsAllowed = true });
-
-            var isValid = service.IsBookingValid(1, new Booking { HasPets = false });
-
-            Assert.True(isValid);
-        }
-
-        [Fact]
-        public void IsBookingValid_NoPetsNotAllowed_IsValid()
-        {
-            var service = Subject();
-            _roomRepo.Setup(r => r.GetRoom(1)).Returns(new Room { ArePetsAllowed = false });
-
-            var isValid = service.IsBookingValid(1, new Booking { HasPets = false });
-
-            Assert.True(isValid);
+            Assert.Equal(isValid, result);
         }
     }
 }
